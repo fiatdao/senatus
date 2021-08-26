@@ -3,7 +3,7 @@ import { BigNumber, ethers as ejs, Signer } from 'ethers';
 import * as helpers from './helpers';
 import { moveAtTimestamp } from './helpers';
 import { expect } from 'chai';
-import { SupernovaMock, Governance } from '../typechain';
+import { SupernovaMock, Governance } from './../typechain';
 
 describe('Governance', function () {
 

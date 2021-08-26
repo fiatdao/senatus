@@ -296,7 +296,7 @@ contract Governance is Bridge {
     // ======================================================================================================
 
     // the Abrogation Proposal is a mechanism for the DAO participants to veto the execution of a proposal that was already
-    // accepted and it is currently queued. For the Abrogation Proposal to pass, 50% + 1 of the vBOND holders
+    // accepted and it is currently queued. For the Abrogation Proposal to pass, 50% + 1 of the vENTR holders
     // must vote FOR the Abrogation Proposal
     function startAbrogationProposal(uint256 proposalId, string memory description) public {
         require(state(proposalId) == ProposalState.Queued, "Proposal must be in queue");
