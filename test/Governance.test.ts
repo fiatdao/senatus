@@ -712,7 +712,8 @@ describe('Governance', function () {
 
             await revertEVM(snapshot);
 
-            await helpers.moveAtTimestamp(creationTs + warmUpDuration + activeDuration + queueDuration + gracePeriodDuration + 1);
+            await helpers.moveAtTimestamp(
+                creationTs + warmUpDuration + activeDuration + queueDuration + gracePeriodDuration + 1);
 
             expect(await governance.state(1)).to.equal(ProposalState.Expired);
             await expect(governance.startAbrogationProposal(1, 'description'))
