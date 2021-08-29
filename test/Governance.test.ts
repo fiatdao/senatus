@@ -68,10 +68,13 @@ describe('Governance', function () {
     describe('activate', function () {
         it('reverts if threshold not yet met', async function () {
             await expect(governance.activate()).to.be.revertedWith('Threshold not met yet');
+
+            await kernel.setEntrStaked(BigNumber.from(4_999_999).mul(helpers.tenPow18));
+            await expect(governance.activate()).to.be.revertedWith('Threshold not met yet');
         });
 
         it('activates if threshold is met', async function () {
-            await kernel.setEntrStaked(BigNumber.from(50_000_000).mul(helpers.tenPow18));
+            await kernel.setEntrStaked(BigNumber.from(5_000_000).mul(helpers.tenPow18));
             await expect(governance.activate()).to.not.be.reverted;
             expect(await governance.isActive()).to.be.true;
         });
