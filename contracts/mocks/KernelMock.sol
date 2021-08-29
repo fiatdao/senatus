@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.7.1;
 
-import "../interfaces/ISupernova.sol";
+import "../interfaces/IKernel.sol";
 
-contract SupernovaMock {
-    uint256 private _xyzStaked;
+contract KernelMock {
+    uint256 private _entrStaked;
     mapping(address => uint256) private _votingPowerAtTs;
     bool public lockCreatorBalanceHasBeenCalled;
     bool public withdrawHasBeenCalled;
@@ -18,16 +18,16 @@ contract SupernovaMock {
         return _votingPowerAtTs[user];
     }
 
-    function xyzStaked() external view returns (uint256) {
-        return _xyzStaked;
+    function entrStaked() external view returns (uint256) {
+        return _entrStaked;
     }
 
-    function xyzStakedAtTs(uint256 ts) public view returns (uint256) {
-        return _xyzStaked;
+    function entrStakedAtTs(uint256 ts) public view returns (uint256) {
+        return _entrStaked;
     }
 
-    function setXyzStaked(uint256 val) public {
-        _xyzStaked = val;
+    function setEntrStaked(uint256 val) public {
+        _entrStaked = val;
     }
 
     function setVotingPower(address user, uint256 val) public {
