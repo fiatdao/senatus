@@ -1,9 +1,9 @@
 import { ethers } from 'hardhat';
 
-const _kernel = '0xA95281904827E1758252bB49eCd5D3Cf06F2040e';
+const KERNEL = '0x48fc1fc9F88fdc98302E40aF50B32B06dDeB7713';
 
 async function main () {
-    const kernel = await ethers.getContractAt('Kernel', _kernel);
+    const kernel = await ethers.getContractAt('IKernel', KERNEL);
     console.log (await kernel.entrStaked());
 }
 
