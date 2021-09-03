@@ -11,7 +11,7 @@ import 'hardhat-contract-sizer';
 task('deploy', 'Deploys and inits the governance contract')
     .addParam('kernel', 'The address of the kernel contract')
     .setAction(async (taskArg) => {
-        const deployGovernance = require('./scripts/deploy-governance');
+        const deployGovernance = require('./scripts/deploy');
         await deployGovernance(taskArg.kernel);
     });
 
