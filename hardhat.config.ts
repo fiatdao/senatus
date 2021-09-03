@@ -8,15 +8,12 @@ import 'solidity-coverage';
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
 
-// This is a sample Buidler task. To learn how to create your own go to
-// https://buidler.dev/guides/create-task.html
-task('accounts', 'Prints the list of accounts', async (args, hre) => {
-    const accounts = await hre.ethers.getSigners();
-
-    for (const account of accounts) {
-        console.log(await account.getAddress());
-    }
-});
+task('deploy', 'Deploys and inits the governance contract')
+    .addParam('kernel', 'The address of the kernel contract')
+    .setAction(async (taskArg) => {
+        const deployGovernance = require('./scripts/deploy-governance');
+        await deployGovernance(taskArg.kernel);
+    });
 
 // Some of the settings should be defined in `./config.js`.
 // Go to https://hardhat.org/config/ for the syntax.

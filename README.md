@@ -26,19 +26,12 @@ yarn run coverage
 
 ## Deployment
 
-1. Deploy the `Governance.sol`
+`Governance.sol` Deployment
+- Deploys the Governance contract
+- Initialises the contract with the provided Kernel Address
+- Verifies the contract at Etherscan
 ```
-npx hardhat run --network {NETWORK} ./scripts/deploy-governance.js
-```
-2. Initialise the Contract
-   1. Populate `GOV` and `KERNEL` properties in the `./init-governance.ts` script
-   2. Execute:
-```
-npx hardhat run --network {NETWORK} ./scripts/init-governance.js
-```
-3. Verify on Etherscan:
-```
-npx hardhat verify --network {NETWORK} {GOVERNANCE_ADDRESS}
+npx hardhat deploy --network {NETWORK} --kernel {ADDRESS}
 ```
 
 ### Mainnet
