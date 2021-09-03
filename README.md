@@ -1,4 +1,4 @@
-# xyzDAO Governance contract
+# EnterDAO Governance contract
 
 ## How it works
 Please see the [SPEC](./SPEC.md)
@@ -8,7 +8,7 @@ Please see the [SPEC](./SPEC.md)
 
 ### 1. Clone this repo
 ```shell
-git clone git@github.com:UniverseXYZ/XYZ-DAO.git
+git clone git@github.com:EnterDAO/ENTER-DAO.git
 ```
 
 ### 2. Install dependencies
@@ -24,17 +24,26 @@ yarn test
 yarn run coverage
 ```
 
-## Deployed contracts
+## Deployment
+
+`Governance.sol` Deployment
+- Deploys the Governance contract
+- Initialises the contract with the provided Kernel Address
+- Verifies the contract at Etherscan
+```
+npx hardhat deploy --network {NETWORK} --kernel {ADDRESS}
+```
+
 ### Mainnet
 ```shell
-Governance deployed at:  0xa8047C2a86D5A188B0e15C3C10E2bc144cB272C2
+Governance deployed at:  TBD
 ```
 ### Rinkeby
 ```shell
-Governance deployed at:  0x63172A077b3740Dd9Ae311F81c72Edb7170F135c
+Governance deployed at:  0x820dB01Bf63f1CFCC0Cff60aE0a177d83678e633
 ```
 
 ## Audits
-UniverseXYZ DAO is a fork of BarnBridge DAO. Here you can find the audits for the original contracts:
+Enter DAO is a fork of BarnBridge DAO. Here you can find the audits for the original contracts:
 - [QuantStamp](https://github.com/BarnBridge/BarnBridge-PM/blob/master/audits/Quantstamp-DAO.pdf)
 - [Haechi](https://github.com/BarnBridge/BarnBridge-PM/blob/master/audits/HAECHI-DAO.pdf)

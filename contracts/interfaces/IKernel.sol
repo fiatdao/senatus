@@ -2,7 +2,7 @@
 pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
-interface ISupernova {
+interface IKernel {
     struct Stake {
         uint256 timestamp;
         uint256 amount;
@@ -10,7 +10,7 @@ interface ISupernova {
         address delegatedTo;
     }
 
-    // deposit allows a user to add more xyz to his staked balance
+    // deposit allows a user to add more ENTR to his staked balance
     function deposit(uint256 amount) external;
 
     // withdraw allows a user to withdraw funds if the balance is not locked
@@ -25,10 +25,10 @@ interface ISupernova {
     // stopDelegate allows a user to take back the delegated voting power
     function stopDelegate() external;
 
-    // balanceOf returns the current BOND balance of a user (bonus not included)
+    // balanceOf returns the current ENTR balance of a user (bonus not included)
     function balanceOf(address user) external view returns (uint256);
 
-    // balanceAtTs returns the amount of BOND that the user currently staked (bonus NOT included)
+    // balanceAtTs returns the amount of ENTR that the user currently staked (bonus NOT included)
     function balanceAtTs(address user, uint256 timestamp) external view returns (uint256);
 
     // stakeAtTs returns the Stake object of the user that was valid at `timestamp`
@@ -40,12 +40,12 @@ interface ISupernova {
     // votingPowerAtTs returns the voting power (bonus included) + delegated voting power for a user at a point in time
     function votingPowerAtTs(address user, uint256 timestamp) external view returns (uint256);
 
-    // xyzStaked returns the total raw amount of BOND staked at the current block
-    function xyzStaked() external view returns (uint256);
+    // entrStaked returns the total raw amount of ENTR staked at the current block
+    function entrStaked() external view returns (uint256);
 
-    // xyzStakedAtTs returns the total raw amount of BOND users have deposited into the contract
+    // entrStakedAtTs returns the total raw amount of ENTR users have deposited into the contract
     // it does not include any bonus
-    function xyzStakedAtTs(uint256 timestamp) external view returns (uint256);
+    function entrStakedAtTs(uint256 timestamp) external view returns (uint256);
 
     // delegatedPower returns the total voting power that a user received from other users
     function delegatedPower(address user) external view returns (uint256);

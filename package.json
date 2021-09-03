@@ -1,5 +1,5 @@
 {
-  "name": "xyz-dao",
+  "name": "enter-dao",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,12 +14,12 @@
     "lint:ts:fix": "eslint . --ext .ts --fix",
     "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\""
   },
-  "author": "SupernovaBridge",
+  "author": "Enter DAO",
   "license": "Apache-2",
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.0",
-    "@nomiclabs/hardhat-etherscan": "^2.0.0",
-    "@nomiclabs/hardhat-waffle": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.0.1",
+    "@nomiclabs/hardhat-etherscan": "^2.1.6",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "^3.2.2-solc-0.7",
     "@typechain/ethers-v5": "^2.0.0",
     "@types/chai": "^4.2.14",
