@@ -36,7 +36,7 @@ npx hardhat deploy --network {NETWORK} --kernel {ADDRESS}
 
 ### Mainnet
 ```shell
-Governance deployed at:  TBD
+Governance deployed at:  0x843Ec9F11E9162bD1A93428f574137Ea2dAFe695
 ```
 ### Rinkeby
 ```shell
