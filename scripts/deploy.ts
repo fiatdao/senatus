@@ -12,8 +12,8 @@ async function deploy(kernel: string) {
 
     console.log('Initializing Governance + waiting block confirmations, please wait...');
     const initTx = await governanceInstance.initialize(kernel);
-    console.log('Initialized')
     await initTx.wait(5);
+    console.log('Initialized')
 
     console.log('Verifying contract on Etherscan...');
     await hardhat.run("verify:verify", {
