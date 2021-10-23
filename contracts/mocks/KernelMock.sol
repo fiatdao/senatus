@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.7.1;
 
-import "../interfaces/IKernel.sol";
+import "../interfaces/IComitium.sol";
 
 contract KernelMock {
-    uint256 private _entrStaked;
+    uint256 private _fdtStaked;
     mapping(address => uint256) private _votingPowerAtTs;
     bool public lockCreatorBalanceHasBeenCalled;
     bool public withdrawHasBeenCalled;
@@ -18,16 +18,16 @@ contract KernelMock {
         return _votingPowerAtTs[user];
     }
 
-    function entrStaked() external view returns (uint256) {
-        return _entrStaked;
+    function fdtStaked() external view returns (uint256) {
+        return _fdtStaked;
     }
 
-    function entrStakedAtTs(uint256 ts) public view returns (uint256) {
-        return _entrStaked;
+    function fdtStakedAtTs(uint256 ts) public view returns (uint256) {
+        return _fdtStaked;
     }
 
-    function setEntrStaked(uint256 val) public {
-        _entrStaked = val;
+    function setFDTStaked(uint256 val) public {
+        _fdtStaked = val;
     }
 
     function setVotingPower(address user, uint256 val) public {
