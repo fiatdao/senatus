@@ -3,7 +3,7 @@ pragma solidity ^0.7.1;
 
 import "../interfaces/IComitium.sol";
 
-contract KernelMock {
+contract ComitiumMock {
     uint256 private _fdtStaked;
     mapping(address => uint256) private _votingPowerAtTs;
     bool public lockCreatorBalanceHasBeenCalled;

@@ -28,10 +28,10 @@ yarn run coverage
 
 `Governance.sol` Deployment
 - Deploys the Governance contract
-- Initialises the contract with the provided Kernel Address
+- Initialises the contract with the provided Comitium Address
 - Verifies the contract at Etherscan
 ```
-npx hardhat deploy --network {NETWORK} --kernel {ADDRESS}
+npx hardhat deploy --network {NETWORK} --comitium {ADDRESS}
 ```
 
 ### Mainnet
