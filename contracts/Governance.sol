@@ -2,8 +2,8 @@
 pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
-import "./interfaces/IKernel.sol";
-import "./Bridge.sol";
+import "./interfaces/IComitium.sol";
+import "./Queue.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
 contract Governance is Bridge {
@@ -123,7 +123,7 @@ contract Governance is Bridge {
 
     function activate() public {
         require(!isActive, "DAO already active");
-        require(kernel.entrStaked() >= ACTIVATION_THRESHOLD, "Threshold not met yet");
+        require(kernel.fdtStaked() >= ACTIVATION_THRESHOLD, "Threshold not met yet");
 
         isActive = true;
     }
@@ -139,7 +139,7 @@ contract Governance is Bridge {
     public returns (uint256)
     {
         if (!isActive) {
-            require(kernel.entrStaked() >= ACTIVATION_THRESHOLD, "DAO not yet active");
+            require(kernel.fdtStaked() >= ACTIVATION_THRESHOLD, "DAO not yet active");
             isActive = true;
         }
 
@@ -296,7 +296,7 @@ contract Governance is Bridge {
     // ======================================================================================================
 
     // the Abrogation Proposal is a mechanism for the DAO participants to veto the execution of a proposal that was already
-    // accepted and it is currently queued. For the Abrogation Proposal to pass, 50% + 1 of the vENTR holders
+    // accepted and it is currently queued. For the Abrogation Proposal to pass, 50% + 1 of the vFDT holders
     // must vote FOR the Abrogation Proposal
     function startAbrogationProposal(uint256 proposalId, string memory description) public {
         require(state(proposalId) == ProposalState.Queued, "Proposal must be in queue");
@@ -520,7 +520,7 @@ contract Governance is Bridge {
     }
 
     function _getCreationThreshold() internal view returns (uint256) {
-        return kernel.entrStaked().div(100);
+        return kernel.fdtStaked().div(100);
     }
 
     // Returns the timestamp of the snapshot for a given proposal
@@ -531,7 +531,7 @@ contract Governance is Bridge {
     }
 
     function _getQuorum(Proposal storage proposal) internal view returns (uint256) {
-        return kernel.entrStakedAtTs(_getSnapshotTimestamp(proposal)).mul(proposal.parameters.minQuorum).div(100);
+        return kernel.fdtStakedAtTs(_getSnapshotTimestamp(proposal)).mul(proposal.parameters.minQuorum).div(100);
     }
 
     function _proposalAbrogated(uint256 proposalId) internal view returns (bool) {
@@ -542,6 +542,6 @@ contract Governance is Bridge {
             return false;
         }
 
-        return cp.forVotes >= kernel.entrStakedAtTs(cp.createTime - 1).div(2);
+        return cp.forVotes >= kernel.fdtStakedAtTs(cp.createTime - 1).div(2);
     }
 }
