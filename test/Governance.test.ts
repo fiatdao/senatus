@@ -3,11 +3,11 @@ import { BigNumber, ethers as ejs, Signer } from 'ethers';
 import * as helpers from './helpers';
 import { moveAtTimestamp } from './helpers';
 import { expect } from 'chai';
-import { KernelMock, Governance } from './../typechain';
+import { ComitiumMock, Governance } from './../typechain';
 
 describe('Governance', function () {
 
-    let governance: Governance, kernel: KernelMock;
+    let governance: Governance, comitium: ComitiumMock;
     let user: Signer, userAddress: string;
     let voter1: Signer, voter2: Signer, voter3: Signer;
     let snapshotId: any;
@@ -30,9 +30,9 @@ describe('Governance', function () {
     const amount = BigNumber.from(28000).mul(BigNumber.from(10).pow(18));
     before(async function () {
         await setupSigners();
-        kernel = await helpers.deployKernel();
+        comitium = await helpers.deployComitium();
         governance = await helpers.deployGovernance();
-        await governance.initialize(kernel.address);
+        await governance.initialize(comitium.address);
 
         warmUpDuration = (await governance.warmUpDuration()).toNumber();
         activeDuration = (await governance.activeDuration()).toNumber();
@@ -69,18 +69,18 @@ describe('Governance', function () {
         it('reverts if threshold not yet met', async function () {
             await expect(governance.activate()).to.be.revertedWith('Threshold not met yet');
 
-            await kernel.setFDTStaked(BigNumber.from(4_999_999).mul(helpers.tenPow18));
+            await comitium.setFDTStaked(BigNumber.from(4_999_999).mul(helpers.tenPow18));
             await expect(governance.activate()).to.be.revertedWith('Threshold not met yet');
         });
 
         it('activates if threshold is met', async function () {
-            await kernel.setFDTStaked(BigNumber.from(5_000_000).mul(helpers.tenPow18));
+            await comitium.setFDTStaked(BigNumber.from(5_000_000).mul(helpers.tenPow18));
             await expect(governance.activate()).to.not.be.reverted;
             expect(await governance.isActive()).to.be.true;
         });
 
         it('reverts if already activated', async function () {
-            await kernel.setFDTStaked(BigNumber.from(50_000_000).mul(helpers.tenPow18));
+            await comitium.setFDTStaked(BigNumber.from(50_000_000).mul(helpers.tenPow18));
             await governance.activate();
 
             await expect(governance.activate()).to.be.revertedWith('DAO already active');
@@ -89,13 +89,13 @@ describe('Governance', function () {
 
     describe('propose', function () {
         before(async function () {
-            await kernel.setFDTStaked(BigNumber.from(50_000_000).mul(helpers.tenPow18));
+            await comitium.setFDTStaked(BigNumber.from(50_000_000).mul(helpers.tenPow18));
             await governance.activate();
-            await kernel.setFDTStaked(0);
+            await comitium.setFDTStaked(0);
         });
 
         it('create new proposal revert reasons', async function () {
-            await kernel.setFDTStaked(amount);
+            await comitium.setFDTStaked(amount);
 
             const targets = [helpers.ZERO_ADDRESS];
             const targetsMismatch = [helpers.ZERO_ADDRESS, helpers.ZERO_ADDRESS];
@@ -110,7 +110,7 @@ describe('Governance', function () {
             await expect(governance.connect(user)
                 .propose(targets, values, signatures, callDatas, 'description', 'title'))
                 .to.be.revertedWith('Creation threshold not met');
-            await kernel.setVotingPower(userAddress, amount.div(10));
+            await comitium.setVotingPower(userAddress, amount.div(10));
             await expect(governance.connect(user)
                 .propose(targetsMismatch, values, signatures, callDatas, 'description', 'title'))
                 .to.be.revertedWith('Proposal function information arity mismatch');
@@ -141,8 +141,8 @@ describe('Governance', function () {
         });
 
         it('create new proposal', async function () {
-            await kernel.setFDTStaked(amount);
-            await kernel.setVotingPower(userAddress, amount.div(10));
+            await comitium.setFDTStaked(amount);
+            await comitium.setVotingPower(userAddress, amount.div(10));
 
             const targets = [helpers.ZERO_ADDRESS];
             const values = ['0'];
@@ -170,8 +170,8 @@ describe('Governance', function () {
         });
 
         it('start vote && quorum', async function () {
-            await kernel.setFDTStaked(amount);
-            await kernel.setVotingPower(userAddress, amount.div(10));
+            await comitium.setFDTStaked(amount);
+            await comitium.setVotingPower(userAddress, amount.div(10));
 
             await createTestProposal();
 
@@ -188,11 +188,11 @@ describe('Governance', function () {
         });
 
         it('cast, cancel and change vote', async function () {
-            await kernel.setFDTStaked(amount);
-            await kernel.setVotingPower(userAddress, amount.div(10));
-            await kernel.setVotingPower(await voter1.getAddress(), amount.div(10));
-            await kernel.setVotingPower(await voter2.getAddress(), amount.div(10));
-            await kernel.setVotingPower(await voter3.getAddress(), amount.div(10));
+            await comitium.setFDTStaked(amount);
+            await comitium.setVotingPower(userAddress, amount.div(10));
+            await comitium.setVotingPower(await voter1.getAddress(), amount.div(10));
+            await comitium.setVotingPower(await voter2.getAddress(), amount.div(10));
+            await comitium.setVotingPower(await voter3.getAddress(), amount.div(10));
 
             await createTestProposal();
 
@@ -226,8 +226,8 @@ describe('Governance', function () {
         });
 
         it('castVote fails if user does not have voting power', async () => {
-            await kernel.setFDTStaked(amount);
-            await kernel.setVotingPower(userAddress, amount.div(10));
+            await comitium.setFDTStaked(amount);
+            await comitium.setVotingPower(userAddress, amount.div(10));
             await createTestProposal();
 
             const ts = await helpers.getCurrentBlockchainTimestamp();
@@ -305,7 +305,7 @@ describe('Governance', function () {
             await helpers.moveAtTimestamp((proposal.eta).toNumber() + 1);
             await governance.execute(1);
             expect(await governance.state(1)).to.be.equal(ProposalState.Executed);
-            expect(await kernel.withdrawHasBeenCalled()).to.be.true;
+            expect(await comitium.withdrawHasBeenCalled()).to.be.true;
         });
 
         it('cannot execute proposals that are not queued', async function () {
@@ -391,14 +391,14 @@ describe('Governance', function () {
             await helpers.moveAtTimestamp((proposal.eta).toNumber() + 1);
             await governance.execute(1);
             expect(await governance.state(1)).to.be.equal(ProposalState.Executed);
-            expect(await kernel.withdrawHasBeenCalled()).to.be.true;
+            expect(await comitium.withdrawHasBeenCalled()).to.be.true;
             await expect(governance.connect(user).cancelProposal(1))
                 .to.be.revertedWith('Proposal in state that does not allow cancellation');
         });
 
         it('fail for invalid quorum', async function () {
-            await kernel.setFDTStaked(amount);
-            await kernel.setVotingPower(userAddress, amount.div(2));
+            await comitium.setFDTStaked(amount);
+            await comitium.setVotingPower(userAddress, amount.div(2));
 
             const targets = [governance.address];
             const signatures = ['setMinQuorum(uint256)'];
@@ -421,9 +421,9 @@ describe('Governance', function () {
         });
 
         it('fail for invalid minimum threshold', async function () {
-            await kernel.setFDTStaked(amount);
-            await kernel.setVotingPower(userAddress, amount.div(2));
-            await kernel.setVotingPower(await voter1.getAddress(), amount.div(2));
+            await comitium.setFDTStaked(amount);
+            await comitium.setVotingPower(userAddress, amount.div(2));
+            await comitium.setVotingPower(await voter1.getAddress(), amount.div(2));
 
             const targets = [governance.address];
             const signatures = ['setAcceptanceThreshold(uint256)'];
@@ -461,8 +461,8 @@ describe('Governance', function () {
 
         it('test change periods', async function () {
             await expect(governance.setActiveDuration(1)).to.be.revertedWith('Only DAO can call');
-            await kernel.setFDTStaked(amount);
-            await kernel.setVotingPower(userAddress, amount.div(2));
+            await comitium.setFDTStaked(amount);
+            await comitium.setVotingPower(userAddress, amount.div(2));
             const targets = [
                 governance.address,
                 governance.address,
@@ -538,7 +538,7 @@ describe('Governance', function () {
             await expect(governance.connect(voter1).cancelProposal(1))
                 .to.be.revertedWith('Cancellation requirements not met');
 
-            await kernel.setVotingPower(userAddress, 0);
+            await comitium.setVotingPower(userAddress, 0);
 
             await expect(governance.connect(voter1).cancelProposal(1)).to.not.be.reverted;
             expect(await governance.state(1)).to.be.equal(ProposalState.Canceled);
@@ -575,7 +575,7 @@ describe('Governance', function () {
                 .to.be.revertedWith('Proposal in state that does not allow cancellation');
 
             // try cancelling with another use and creator balance below threshold
-            await kernel.setVotingPower(userAddress, 0);
+            await comitium.setVotingPower(userAddress, 0);
             await expect(governance.connect(voter1).cancelProposal(1))
                 .to.be.revertedWith('Proposal in state that does not allow cancellation');
 
@@ -746,7 +746,7 @@ describe('Governance', function () {
             await expect(governance.connect(somebody).startAbrogationProposal(1, 'description'))
                 .to.be.revertedWith('Creation threshold not met');
 
-            await kernel.setVotingPower(await somebody.getAddress(), amount);
+            await comitium.setVotingPower(await somebody.getAddress(), amount);
 
             await expect(governance.connect(somebody).startAbrogationProposal(1, 'description'))
                 .to.not.be.reverted;
@@ -783,7 +783,7 @@ describe('Governance', function () {
                 await prepareProposalForAbrogation();
                 await governance.connect(user).startAbrogationProposal(1, 'description');
 
-                await kernel.setVotingPower(await voter3.getAddress(), 0);
+                await comitium.setVotingPower(await voter3.getAddress(), 0);
 
                 await expect(governance.connect(voter3).abrogationProposal_castVote(1, true))
                     .to.be.revertedWith('no voting power');
@@ -964,9 +964,9 @@ describe('Governance', function () {
         });
 
         it('parameters changed mid-flight do not affect running proposals', async () => {
-            await kernel.setFDTStaked(amount);
-            await kernel.setVotingPower(userAddress, amount.div(2));
-            await kernel.setVotingPower(await voter1.getAddress(), amount.div(2));
+            await comitium.setFDTStaked(amount);
+            await comitium.setVotingPower(userAddress, amount.div(2));
+            await comitium.setVotingPower(await voter1.getAddress(), amount.div(2));
 
             const parameters = {
                 warmUpDuration: await governance.warmUpDuration(),
@@ -1117,15 +1117,15 @@ describe('Governance', function () {
     }
 
     async function setupEnv () {
-        await kernel.setFDTStaked(amount);
-        await kernel.setVotingPower(userAddress, amount.div(5));
-        await kernel.setVotingPower(await voter1.getAddress(), amount.div(20));
-        await kernel.setVotingPower(await voter2.getAddress(), amount.div(5));
-        await kernel.setVotingPower(await voter3.getAddress(), amount.div(5));
+        await comitium.setFDTStaked(amount);
+        await comitium.setVotingPower(userAddress, amount.div(5));
+        await comitium.setVotingPower(await voter1.getAddress(), amount.div(20));
+        await comitium.setVotingPower(await voter2.getAddress(), amount.div(5));
+        await comitium.setVotingPower(await voter3.getAddress(), amount.div(5));
     }
 
     async function createTestProposal () {
-        const targets = [kernel.address];
+        const targets = [comitium.address];
         const values = [0];
         const signatures = ['withdraw(uint256)'];
         const callDatas = [ejs.utils.defaultAbiCoder.encode(['uint256'], [1])];

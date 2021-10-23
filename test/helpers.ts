@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { BigNumber, ContractFactory } from 'ethers';
-import { KernelMock, Governance } from '../typechain';
+import { ComitiumMock, Governance } from '../typechain';
 
 enum ProposalState {
     WarmUp,
@@ -18,12 +18,12 @@ enum ProposalState {
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const tenPow18 = BigNumber.from(10).pow(18);
 
-export async function deployKernel (): Promise<KernelMock> {
-    const KernelMock: ContractFactory = await ethers.getContractFactory('KernelMock');
-    const kernel: KernelMock = (await KernelMock.deploy()) as KernelMock;
-    await kernel.deployed();
+export async function deployComitium (): Promise<ComitiumMock> {
+    const ComitiumMock: ContractFactory = await ethers.getContractFactory('ComitiumMock');
+    const comitium: ComitiumMock = (await ComitiumMock.deploy()) as ComitiumMock;
+    await comitium.deployed();
 
-    return kernel;
+    return comitium;
 }
 
 export async function deployGovernance (): Promise<Governance> {

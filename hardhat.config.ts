@@ -9,10 +9,10 @@ import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
 
 task('deploy', 'Deploys and inits the governance contract')
-    .addParam('kernel', 'The address of the kernel contract')
+    .addParam('comitium', 'The address of the comitium contract')
     .setAction(async (taskArg) => {
         const deployGovernance = require('./scripts/deploy');
-        await deployGovernance(taskArg.kernel);
+        await deployGovernance(taskArg.comitium);
     });
 
 // Some of the settings should be defined in `./config.js`.

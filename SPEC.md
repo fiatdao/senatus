@@ -1,7 +1,7 @@
 ## Thresholds
 
-- **Create proposal**: 1% of FDT staked in Kernel
-- **Minimum quorum**: 40% of FDT staked in Kernel
+- **Create proposal**: 1% of FDT staked in Comitium
+- **Minimum quorum**: 40% of FDT staked in Comitium
 - **Minimum acceptance**: 60% of votes
 
 ## Proposals

@@ -1,7 +1,7 @@
 import hardhat from 'hardhat';
 const ethers = hardhat.ethers;
 
-async function deploy(kernel: string) {
+async function deploy(comitium: string) {
     await hardhat.run('compile');
 
     const Governance = await ethers.getContractFactory('Governance');
@@ -11,7 +11,7 @@ async function deploy(kernel: string) {
     console.log(`Governance Deployed at ${governanceInstance.address}`)
 
     console.log('Initializing Governance + waiting block confirmations, please wait...');
-    const initTx = await governanceInstance.initialize(kernel);
+    const initTx = await governanceInstance.initialize(comitium);
     await initTx.wait(5);
     console.log('Initialized')
 

@@ -2,7 +2,7 @@
 pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
-interface IKernel {
+interface IComitium {
     struct Stake {
         uint256 timestamp;
         uint256 amount;

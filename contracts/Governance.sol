@@ -95,7 +95,7 @@ contract Governance is Bridge {
     mapping(uint256 => Proposal) public proposals;
     mapping(uint256 => AbrogationProposal) public abrogationProposals;
     mapping(address => uint256) public latestProposalIds;
-    IKernel kernel;
+    IComitium comitium;
     bool isInitialized;
     bool public isActive;
 
@@ -113,17 +113,17 @@ contract Governance is Bridge {
     receive() external payable {}
 
     // executed only once
-    function initialize(address _kernel) public {
+    function initialize(address _comitium) public {
         require(isInitialized == false, "Contract already initialized.");
-        require(_kernel != address(0), "kernel must not be 0x0");
+        require(_comitium != address(0), "comitium must not be 0x0");
 
-        kernel = IKernel(_kernel);
+        comitium = IComitium(_comitium);
         isInitialized = true;
     }
 
     function activate() public {
         require(!isActive, "DAO already active");
-        require(kernel.fdtStaked() >= ACTIVATION_THRESHOLD, "Threshold not met yet");
+        require(comitium.fdtStaked() >= ACTIVATION_THRESHOLD, "Threshold not met yet");
 
         isActive = true;
     }
@@ -139,12 +139,12 @@ contract Governance is Bridge {
     public returns (uint256)
     {
         if (!isActive) {
-            require(kernel.fdtStaked() >= ACTIVATION_THRESHOLD, "DAO not yet active");
+            require(comitium.fdtStaked() >= ACTIVATION_THRESHOLD, "DAO not yet active");
             isActive = true;
         }
 
         require(
-            kernel.votingPowerAtTs(msg.sender, block.timestamp - 1) >= _getCreationThreshold(),
+            comitium.votingPowerAtTs(msg.sender, block.timestamp - 1) >= _getCreationThreshold(),
             "Creation threshold not met"
         );
         require(
@@ -243,7 +243,7 @@ contract Governance is Bridge {
         // exit if user already voted
         require(receipt.hasVoted == false || receipt.hasVoted && receipt.support != support, "Already voted this option");
 
-        uint256 votes = kernel.votingPowerAtTs(msg.sender, _getSnapshotTimestamp(proposal));
+        uint256 votes = comitium.votingPowerAtTs(msg.sender, _getSnapshotTimestamp(proposal));
         require(votes > 0, "no voting power");
 
         // means it changed its vote
@@ -274,7 +274,7 @@ contract Governance is Bridge {
         Proposal storage proposal = proposals[proposalId];
         Receipt storage receipt = proposal.receipts[msg.sender];
 
-        uint256 votes = kernel.votingPowerAtTs(msg.sender, _getSnapshotTimestamp(proposal));
+        uint256 votes = comitium.votingPowerAtTs(msg.sender, _getSnapshotTimestamp(proposal));
 
         require(receipt.hasVoted, "Cannot cancel if not voted yet");
 
@@ -301,7 +301,7 @@ contract Governance is Bridge {
     function startAbrogationProposal(uint256 proposalId, string memory description) public {
         require(state(proposalId) == ProposalState.Queued, "Proposal must be in queue");
         require(
-            kernel.votingPowerAtTs(msg.sender, block.timestamp - 1) >= _getCreationThreshold(),
+            comitium.votingPowerAtTs(msg.sender, block.timestamp - 1) >= _getCreationThreshold(),
             "Creation threshold not met"
         );
 
@@ -349,7 +349,7 @@ contract Governance is Bridge {
             "Already voted this option"
         );
 
-        uint256 votes = kernel.votingPowerAtTs(msg.sender, abrogationProposal.createTime - 1);
+        uint256 votes = comitium.votingPowerAtTs(msg.sender, abrogationProposal.createTime - 1);
         require(votes > 0, "no voting power");
 
         // means it changed its vote
@@ -385,7 +385,7 @@ contract Governance is Bridge {
             "Abrogation Proposal not active"
         );
 
-        uint256 votes = kernel.votingPowerAtTs(msg.sender, abrogationProposal.createTime - 1);
+        uint256 votes = comitium.votingPowerAtTs(msg.sender, abrogationProposal.createTime - 1);
 
         require(receipt.hasVoted, "Cannot cancel if not voted yet");
 
@@ -487,7 +487,7 @@ contract Governance is Bridge {
         Proposal storage proposal = proposals[proposalId];
 
         if (msg.sender == proposal.proposer ||
-            kernel.votingPower(proposal.proposer) < _getCreationThreshold()
+            comitium.votingPower(proposal.proposer) < _getCreationThreshold()
         ) {
             return true;
         }
@@ -520,7 +520,7 @@ contract Governance is Bridge {
     }
 
     function _getCreationThreshold() internal view returns (uint256) {
-        return kernel.fdtStaked().div(100);
+        return comitium.fdtStaked().div(100);
     }
 
     // Returns the timestamp of the snapshot for a given proposal
@@ -531,7 +531,7 @@ contract Governance is Bridge {
     }
 
     function _getQuorum(Proposal storage proposal) internal view returns (uint256) {
-        return kernel.fdtStakedAtTs(_getSnapshotTimestamp(proposal)).mul(proposal.parameters.minQuorum).div(100);
+        return comitium.fdtStakedAtTs(_getSnapshotTimestamp(proposal)).mul(proposal.parameters.minQuorum).div(100);
     }
 
     function _proposalAbrogated(uint256 proposalId) internal view returns (bool) {
@@ -542,6 +542,6 @@ contract Governance is Bridge {
             return false;
         }
 
-        return cp.forVotes >= kernel.fdtStakedAtTs(cp.createTime - 1).div(2);
+        return cp.forVotes >= comitium.fdtStakedAtTs(cp.createTime - 1).div(2);
     }
 }
