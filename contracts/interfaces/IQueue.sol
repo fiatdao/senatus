@@ -2,7 +2,7 @@
 pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
-interface IBridge {
+interface IQueue {
     function queuedTransactions(bytes32 txHash) external view returns (bool);
 
     function queueTransaction(address target, uint256 value, string memory signature, bytes memory data, uint256 eta) external returns (bytes32);
