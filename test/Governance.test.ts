@@ -74,7 +74,7 @@ describe('Governance', function () {
         });
 
         it('activates if threshold is met', async function () {
-            await comitium.setFDTStaked(BigNumber.from(5_000_000).mul(helpers.tenPow18));
+            await comitium.setFDTStaked(BigNumber.from(20_000_000).mul(helpers.tenPow18));
             await expect(governance.activate()).to.not.be.reverted;
             expect(await governance.isActive()).to.be.true;
         });

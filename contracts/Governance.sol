@@ -6,7 +6,7 @@ import "./interfaces/IComitium.sol";
 import "./Queue.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-contract Governance is Bridge {
+contract Governance is Queue {
     using SafeMath for uint256;
 
     enum ProposalState {

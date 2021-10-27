@@ -3,7 +3,7 @@ pragma solidity 0.7.6;
 
 import "./Parameters.sol";
 
-abstract contract Bridge is Parameters {
+abstract contract Queue is Parameters {
 
     mapping(bytes32 => bool) public queuedTransactions;
 
