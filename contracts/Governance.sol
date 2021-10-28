@@ -149,7 +149,7 @@ contract Governance is Queue {
         );
         require(
             targets.length == values.length && targets.length == signatures.length && targets.length == calldatas.length,
-            "Proposal function information arity mismatch"
+            "Proposal function information parity mismatch"
         );
         require(targets.length != 0, "Must provide actions");
         require(targets.length <= PROPOSAL_MAX_ACTIONS, "Too many actions on a vote");

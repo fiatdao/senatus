@@ -113,16 +113,16 @@ describe('Governance', function () {
             await comitium.setVotingPower(userAddress, amount.div(10));
             await expect(governance.connect(user)
                 .propose(targetsMismatch, values, signatures, callDatas, 'description', 'title'))
-                .to.be.revertedWith('Proposal function information arity mismatch');
+                .to.be.revertedWith('Proposal function information parity mismatch');
             await expect(governance.connect(user)
                 .propose(targets, valuesMismatch, signatures, callDatas, 'description', 'title'))
-                .to.be.revertedWith('Proposal function information arity mismatch');
+                .to.be.revertedWith('Proposal function information parity mismatch');
             await expect(governance.connect(user)
                 .propose(targets, values, signaturesMismatch, callDatas, 'description', 'title'))
-                .to.be.revertedWith('Proposal function information arity mismatch');
+                .to.be.revertedWith('Proposal function information parity mismatch');
             await expect(governance.connect(user)
                 .propose(targets, values, signatures, callDatasMismatch, 'description', 'title'))
-                .to.be.revertedWith('Proposal function information arity mismatch');
+                .to.be.revertedWith('Proposal function information parity mismatch');
             await expect(governance.connect(user)
                 .propose([], [], [], [], 'description', 'title'))
                 .to.be.revertedWith('Must provide actions');
