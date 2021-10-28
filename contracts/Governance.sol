@@ -195,10 +195,7 @@ contract Governance is Queue {
         uint256 eta = proposal.createTime + proposal.parameters.warmUpDuration + proposal.parameters.activeDuration + proposal.parameters.queueDuration;
         proposal.eta = eta;
 
-        // Cache length
-        uint256 proposalTargetsLength = proposal.targets.length;
-
-        for (uint256 i = 0; i < proposalTargetsLength; i++) {
+        for (uint256 i = 0; i < proposal.targets.length; i++) {
             require(
                 !queuedTransactions[_getTxHash(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], eta)],
                 "proposal action already queued at eta"
@@ -216,10 +213,7 @@ contract Governance is Queue {
         Proposal storage proposal = proposals[proposalId];
         proposal.executed = true;
 
-        // Cache length
-        uint256 proposalTargetsLength = proposal.targets.length;
-
-        for (uint256 i = 0; i < proposalTargetsLength; i++) {
+        for (uint256 i = 0; i < proposal.targets.length; i++) {
             executeTransaction(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], proposal.eta);
         }
 
