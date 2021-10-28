@@ -330,7 +330,8 @@ contract Governance is Queue {
 
         proposal.canceled = true;
 
-        for (uint256 i = 0; i < proposal.targets.length; i++) {
+        uint256 proposalTargetsLength = proposal.targets.length;
+        for (uint256 i = 0; i < proposalTargetsLength; i++) {
             cancelTransaction(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], proposal.eta);
         }
 
