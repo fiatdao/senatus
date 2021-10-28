@@ -197,12 +197,17 @@ contract Governance is Queue {
 
         uint256 proposalTargetsLength = proposal.targets.length;
         for (uint256 i = 0; i < proposalTargetsLength; i++) {
+            address target = proposal.targets[i];
+            uint256 value = proposal.values[i];
+            string memory signature = proposal.signatures[i];
+            bytes memory data = proposal.calldatas[i];
+
             require(
-                !queuedTransactions[_getTxHash(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], eta)],
+                !queuedTransactions[_getTxHash(target, value, signature, data, eta)],
                 "proposal action already queued at eta"
             );
 
-            queueTransaction(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], eta);
+            queueTransaction(target, value, signature, data, eta);
         }
 
         emit ProposalQueued(proposalId, msg.sender, eta);
