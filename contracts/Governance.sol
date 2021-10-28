@@ -25,10 +25,10 @@ contract Governance is Queue {
     struct Receipt {
         // Whether or not a vote has been cast
         bool hasVoted;
-        // The number of votes the voter had, which were cast
-        uint256 votes;
         // support
         bool support;
+        // The number of votes the voter had, which were cast
+        uint256 votes;
     }
 
     struct AbrogationProposal {
