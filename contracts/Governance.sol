@@ -214,7 +214,7 @@ contract Governance is Queue {
     }
 
     function execute(uint256 proposalId) public payable {
-        require(_canBeExecuted(proposalId), "Cannot be executed");
+        require(state(proposalId) == ProposalState.Grace, "Cannot be executed");
 
         Proposal storage proposal = proposals[proposalId];
         proposal.executed = true;
@@ -428,24 +428,32 @@ contract Governance is Queue {
             return ProposalState.Executed;
         }
 
-        if (block.timestamp <= proposal.createTime + proposal.parameters.warmUpDuration) {
+        uint256 createTimeCache = proposal.createTime;
+        uint256 warmUpDurationCache = proposal.parameters.warmUpDuration;
+
+        if (block.timestamp <= createTimeCache + warmUpDurationCache) {
             return ProposalState.WarmUp;
         }
 
-        if (block.timestamp <= proposal.createTime + proposal.parameters.warmUpDuration + proposal.parameters.activeDuration) {
+        if (block.timestamp <= createTimeCache + warmUpDurationCache + proposal.parameters.activeDuration) {
             return ProposalState.Active;
         }
 
-        if ((proposal.forVotes + proposal.againstVotes) < _getQuorum(proposal) ||
-            (proposal.forVotes < _getMinForVotes(proposal))) {
+        uint256 forVotesCache = proposal.forVotes;
+        uint256 minForVotesCache = (forVotesCache + proposal.againstVotes).mul(proposal.parameters.acceptanceThreshold).div(100);
+
+        if ((forVotesCache + proposal.againstVotes) < _getQuorum(proposal) ||
+            (forVotesCache < minForVotesCache)) {
             return ProposalState.Failed;
         }
 
-        if (proposal.eta == 0) {
+        uint256 etaCache = proposal.eta;
+
+        if (etaCache == 0) {
             return ProposalState.Accepted;
         }
 
-        if (block.timestamp < proposal.eta) {
+        if (block.timestamp < etaCache) {
             return ProposalState.Queued;
         }
 
@@ -453,7 +461,7 @@ contract Governance is Queue {
             return ProposalState.Abrogated;
         }
 
-        if (block.timestamp <= proposal.eta + proposal.parameters.gracePeriodDuration) {
+        if (block.timestamp <= etaCache + proposal.parameters.gracePeriodDuration) {
             return ProposalState.Grace;
         }
 
@@ -518,14 +526,6 @@ contract Governance is Queue {
         s == ProposalState.Accepted ||
         s == ProposalState.Queued ||
         s == ProposalState.Grace;
-    }
-
-    function _canBeExecuted(uint256 proposalId) internal view returns (bool) {
-        return state(proposalId) == ProposalState.Grace;
-    }
-
-    function _getMinForVotes(Proposal storage proposal) internal view returns (uint256) {
-        return (proposal.forVotes + proposal.againstVotes).mul(proposal.parameters.acceptanceThreshold).div(100);
     }
 
     function _getCreationThreshold() internal view returns (uint256) {
