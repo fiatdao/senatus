@@ -25,10 +25,10 @@ contract Governance is Queue {
     struct Receipt {
         // Whether or not a vote has been cast
         bool hasVoted;
-        // The number of votes the voter had, which were cast
-        uint256 votes;
         // support
         bool support;
+        // The number of votes the voter had, which were cast
+        uint256 votes;
     }
 
     struct AbrogationProposal {
@@ -149,7 +149,7 @@ contract Governance is Queue {
         );
         require(
             targets.length == values.length && targets.length == signatures.length && targets.length == calldatas.length,
-            "Proposal function information arity mismatch"
+            "Proposal function information parity mismatch"
         );
         require(targets.length != 0, "Must provide actions");
         require(targets.length <= PROPOSAL_MAX_ACTIONS, "Too many actions on a vote");
@@ -195,25 +195,32 @@ contract Governance is Queue {
         uint256 eta = proposal.createTime + proposal.parameters.warmUpDuration + proposal.parameters.activeDuration + proposal.parameters.queueDuration;
         proposal.eta = eta;
 
-        for (uint256 i = 0; i < proposal.targets.length; i++) {
+        uint256 proposalTargetsLength = proposal.targets.length;
+        for (uint256 i = 0; i < proposalTargetsLength; i++) {
+            address target = proposal.targets[i];
+            uint256 value = proposal.values[i];
+            string memory signature = proposal.signatures[i];
+            bytes memory data = proposal.calldatas[i];
+
             require(
-                !queuedTransactions[_getTxHash(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], eta)],
+                !queuedTransactions[_getTxHash(target, value, signature, data, eta)],
                 "proposal action already queued at eta"
             );
 
-            queueTransaction(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], eta);
+            queueTransaction(target, value, signature, data, eta);
         }
 
         emit ProposalQueued(proposalId, msg.sender, eta);
     }
 
     function execute(uint256 proposalId) public payable {
-        require(_canBeExecuted(proposalId), "Cannot be executed");
+        require(state(proposalId) == ProposalState.Grace, "Cannot be executed");
 
         Proposal storage proposal = proposals[proposalId];
         proposal.executed = true;
 
-        for (uint256 i = 0; i < proposal.targets.length; i++) {
+        uint256 proposalTargetsLength = proposal.targets.length;
+        for (uint256 i = 0; i < proposalTargetsLength; i++) {
             executeTransaction(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], proposal.eta);
         }
 
@@ -227,7 +234,8 @@ contract Governance is Queue {
         Proposal storage proposal = proposals[proposalId];
         proposal.canceled = true;
 
-        for (uint256 i = 0; i < proposal.targets.length; i++) {
+        uint256 proposalTargetsLength = proposal.targets.length;
+        for (uint256 i = 0; i < proposalTargetsLength; i++) {
             cancelTransaction(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], proposal.eta);
         }
 
@@ -327,7 +335,8 @@ contract Governance is Queue {
 
         proposal.canceled = true;
 
-        for (uint256 i = 0; i < proposal.targets.length; i++) {
+        uint256 proposalTargetsLength = proposal.targets.length;
+        for (uint256 i = 0; i < proposalTargetsLength; i++) {
             cancelTransaction(proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i], proposal.eta);
         }
 
@@ -419,24 +428,32 @@ contract Governance is Queue {
             return ProposalState.Executed;
         }
 
-        if (block.timestamp <= proposal.createTime + proposal.parameters.warmUpDuration) {
+        uint256 createTimeCache = proposal.createTime;
+        uint256 warmUpDurationCache = proposal.parameters.warmUpDuration;
+
+        if (block.timestamp <= createTimeCache + warmUpDurationCache) {
             return ProposalState.WarmUp;
         }
 
-        if (block.timestamp <= proposal.createTime + proposal.parameters.warmUpDuration + proposal.parameters.activeDuration) {
+        if (block.timestamp <= createTimeCache + warmUpDurationCache + proposal.parameters.activeDuration) {
             return ProposalState.Active;
         }
 
-        if ((proposal.forVotes + proposal.againstVotes) < _getQuorum(proposal) ||
-            (proposal.forVotes < _getMinForVotes(proposal))) {
+        uint256 forVotesCache = proposal.forVotes;
+        uint256 minForVotesCache = (forVotesCache + proposal.againstVotes).mul(proposal.parameters.acceptanceThreshold).div(100);
+
+        if ((forVotesCache + proposal.againstVotes) < _getQuorum(proposal) ||
+            (forVotesCache < minForVotesCache)) {
             return ProposalState.Failed;
         }
 
-        if (proposal.eta == 0) {
+        uint256 etaCache = proposal.eta;
+
+        if (etaCache == 0) {
             return ProposalState.Accepted;
         }
 
-        if (block.timestamp < proposal.eta) {
+        if (block.timestamp < etaCache) {
             return ProposalState.Queued;
         }
 
@@ -444,7 +461,7 @@ contract Governance is Queue {
             return ProposalState.Abrogated;
         }
 
-        if (block.timestamp <= proposal.eta + proposal.parameters.gracePeriodDuration) {
+        if (block.timestamp <= etaCache + proposal.parameters.gracePeriodDuration) {
             return ProposalState.Grace;
         }
 
@@ -509,14 +526,6 @@ contract Governance is Queue {
         s == ProposalState.Accepted ||
         s == ProposalState.Queued ||
         s == ProposalState.Grace;
-    }
-
-    function _canBeExecuted(uint256 proposalId) internal view returns (bool) {
-        return state(proposalId) == ProposalState.Grace;
-    }
-
-    function _getMinForVotes(Proposal storage proposal) internal view returns (uint256) {
-        return (proposal.forVotes + proposal.againstVotes).mul(proposal.parameters.acceptanceThreshold).div(100);
     }
 
     function _getCreationThreshold() internal view returns (uint256) {
