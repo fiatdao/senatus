@@ -36,11 +36,11 @@ npx hardhat deploy --network {NETWORK} --comitium {ADDRESS}
 
 ### Mainnet
 ```shell
-Governance deployed at:  0x843Ec9F11E9162bD1A93428f574137Ea2dAFe695
+Governance deployed at:  0xa55E0d3d697C4692e9C37bC3a7062b1bECeEF45B
 ```
 ### Rinkeby
 ```shell
-Governance deployed at:  0x820dB01Bf63f1CFCC0Cff60aE0a177d83678e633
+Governance deployed at:  0x97379b1B65825FE21598a1549aBf344eCb32dC95
 ```
 
 ## Audits
